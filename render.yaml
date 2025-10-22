@@ -2,7 +2,7 @@ services:
   - type: web
     name: my-ai-api        # Render에서 사용할 서비스 이름 (원하는 대로 수정 가능)
     runtime: python       # 'env:'가 아니라 'runtime:'이 올바른 키입니다.
-    pythonVersion: "3.11"   # 버전을 따옴표로 감싸주는 것이 안전합니다.
+    pythonVersion: "3.12.11"   # 버전을 따옴표로 감싸주는 것이 안전합니다.
     
     # Flask 서버가 있는 실제 폴더 경로 (중요!)
     rootDir: Project1/models/XGBoost
