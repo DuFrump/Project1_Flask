@@ -38,7 +38,6 @@ matplotlib==3.10.6
 mdurl==0.1.2
 missingno==0.5.2
 mkl-service==2.4.0
-mkl_fft @ file:///C:/b/abs_64riv3lfyn/croot/mkl_fft_1751310924052/work
 mkl_random @ file:///C:/b/abs_47jvsmau4j/croot/mkl_random_1751310922820/work
 murmurhash==1.0.13
 nltk==3.9.1
