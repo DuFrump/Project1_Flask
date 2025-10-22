@@ -3,7 +3,7 @@ services:
     name: my-ai-api
     runtime: python
     pythonVersion: "3.11"
-    rootDir: Project1/models/XGBoost
+    rootDir: C:\Program Files (x86)\__DuFrump__\DuFrump_산대특_과정\07_Final_Projects\Project1\models\XGBoost
     buildCommand: "apt-get update && apt-get install -y openjdk-17-jdk && pip install -r requirements.txt"
     startCommand: "gunicorn api_server:app"
     plan: free
