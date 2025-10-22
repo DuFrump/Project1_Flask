@@ -3,6 +3,7 @@ from konlpy.tag import Okt
 from flask import Flask, request, jsonify
 import numpy as np # numpy를 임포트하면 더 안정적입니다.
 from flask_cors import CORS
+from topic_utils import tokenize
 
 # --- Flask 앱 생성 ---
 app = Flask(__name__)
@@ -25,9 +26,9 @@ def analyze_topic():
     })
 
 # --- 2. 학습 때와 동일한 토크나이저 함수 정의 ---
-okt = Okt()
-def tokenize(text):
-    return [word for word, pos in okt.pos(text, stem=True) if pos in ['Noun', 'Verb', 'Adjective']]
+# okt = Okt()
+# def tokenize(text):
+#     return [word for word, pos in okt.pos(text, stem=True) if pos in ['Noun', 'Verb', 'Adjective']]
 
 # --- 1. 모델과 필요 도구를 미리 불러오기 ---
 print("🚀 모델과 도구들을 불러오는 중입니다...")
