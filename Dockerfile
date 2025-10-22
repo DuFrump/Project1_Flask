@@ -2,7 +2,8 @@
 FROM python:3.12-slim
 
 # 2. (핵심!) Java(JDK) 17 버전을 먼저 설치합니다.
-RUN apt-get update && apt-get install -y openjdk-17-jdk && rm -rf /var/lib/apt/lists/*
+# openjdk-17-jdk 대신, 이 시스템의 기본 Java 패키지(default-jdk)를 설치합니다.
+RUN apt-get update && apt-get install -y default-jdk && rm -rf /var/lib/apt/lists/*
 
 # 3. /app 이라는 작업 폴더를 만듭니다.
 WORKDIR /app
