@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: my-ai-api
-    runtime: python
-    pythonVersion: "3.12"
-    rootDir: Project1/models/XGBoost
-    buildCommand: "apt-get update && apt-get install -y openjdk-17-jdk && pip install -r ../../../requirements.txt"
-    startCommand: "gunicorn api_server:app"
-    plan: free
