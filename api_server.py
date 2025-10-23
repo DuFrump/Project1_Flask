@@ -9,7 +9,7 @@ from topic_utils import tokenize
 app = Flask(__name__)
 CORS(app, origins=["https://interest-56pc.onrender.com"])
 
-@app.route('predict', methods=['POST'])
+@app.route('api-topic', methods=['POST'])
 def analyze_topic():
     data = request.get_json()
     sentence = data.get('sentence', '')
