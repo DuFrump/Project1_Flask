@@ -1,0 +1,22 @@
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  web:
+    resources:
+      static-locations: classpath:/static/
+server:
+  port: 8080
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-5
+  url: https://api.openai.com/v1/chat/completions
+
+python:
+  ai:
+    server:
+      url: ${RENDER_FLASK_KEY:http://localhost:5000}
+
+

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대화형 관심사 분석</title>
+    <link rel="stylesheet" href="/css/chat.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="window">
+    <!-- 상단바 -->
+    <div class="header">
+        <div class="diamond"></div>
+        <div class="arrow"></div>
+    </div>
+
+    <!-- 채팅 영역 -->
+    <div class="chat-area" id="chatArea"></div>
+
+    <!-- 입력창 -->
+    <div class="input-area">
+        <input id="userInput" placeholder="답변을 입력하세요..." />
+        <button id="sendBtn">▶</button>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatArea = document.getElementById("chatArea");
+
+    // 질문 리스트
+    const botQuestions = [
+      "질문 1: 혹시 최근 주말에 가장 시간 가는 줄 모르고 집중했던 일이나, 가장 즐거웠던 활동이 있으신가요?",
+      "질문 2: 요즘 뉴스를 볼 때 자신도 모르게 눈길이 가거나 가장 중요하게 생각하는 분야의 소식이 있으신가요?",
+      "질문 3: 만약 금전적인 여유가 생긴다면, 가장 먼저 투자하거나 도전해 보고 싶은 분야는 무엇인가요?",
+      "질문 4: 일상에서 스트레스가 쌓이거나 피로할 때, 가장 즐겨 찾거나 몰입하는 '나만의 해소법'이 있으신가요?",
+      "질문 5: 혹시 최근에 새롭게 배우기 시작했거나, 지식을 쌓고 있는 분야가 있다면 무엇인가요?"
+    ];
+
+    let qIndex = 0;
+    let allowPlanQuestions = false;   // ✅ 주제 관련 질문 가능 여부
+    let currentPlan = "";             // ✅ 최신 일주일 계획 저장
+    let currentTopic = "";            // ✅ 현재 주제 저장
+
+    // 🧮 총합 점수 누적용 객체
+    let totalScores = {
+      "영화/미디어": 0,
+      "스포츠": 0,
+      "경제/재테크": 0,
+      "기술/IT": 0,
+      "일상/여행": 0
+    };
+
+    // 💬 말풍선 추가 함수
+    function addMessage(text, sender = "user") {
+      const div = document.createElement("div");
+      div.className = sender === "user" ? "user-bubble" : "bot-bubble";
+      div.innerHTML = text;
+      chatArea.appendChild(div);
+      scrollToBottom(50);
+      return div;
+    }
+
+    // 🤖 질문 출력 함수
+    function botAsk() {
+      if (qIndex < botQuestions.length) {
+        setTimeout(() => addMessage(botQuestions[qIndex++], "bot"), 300);
+      } else {
+        showFinalSummary(); // ✅ 마지막 질문 끝나면 총합 계산 호출
+      }
+    }
+
+    // 📊 질문별 결과 표시
+    function showResult(resultData) {
+  addMessage("당신의 답변을 기반으로 한 관심사 분석 결과입니다.", "bot");
+
+  for (let key in resultData) totalScores[key] += resultData[key];
+
+  const chartBubble = addMessage("", "bot");
+  chartBubble.innerHTML = `
+    <div class="result-box" style="
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: nowrap;
+      background-color: #dcccff;
+      border-radius: 20px;
+      padding: 20px;
+    ">
+      <canvas id="resultChart${qIndex}" width="180" height="180"></canvas>
+
+      <div class="custom-legend" style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 15px;
+        color: #3E3659;
+        line-height: 1.4;
+      "></div>
+    </div>
+
+    <ul class="rank-list" style="margin-top: 10px;">
+      ${Object.entries(resultData)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v], i) => `<li>${i + 1}. ${k} — ${v.toFixed(1)}%</li>`)
+        .join("")}
+    </ul>
+  `;
+
+  const ctx = chartBubble.querySelector(`#resultChart${qIndex}`);
+  const legendDiv = chartBubble.querySelector(".custom-legend");
+  legendDiv.style.display = "flex";
+  legendDiv.style.flexDirection = "column"; // ✅ 수직 정렬 유지
+  legendDiv.style.alignItems = "flex-start";
+  legendDiv.style.gap = "10px"; // 각 범례 간 간격
+  legendDiv.style.fontSize = "9px";
+  legendDiv.style.lineHeight = "1.3";
+  legendDiv.style.whiteSpace = "nowrap"; // ✅ 줄바꿈 금지!
+  legendDiv.style.width = "120px"; // ✅ 충분한 폭 확보
+  legendDiv.style.marginLeft = "-10px";  // 음수값으로 왼쪽으로 이동
+  const labels = Object.keys(resultData);
+  const values = Object.values(resultData);
+  const colors = ["#A391E3", "#C7B9FF", "#7A6EE0", "#BBAAF5", "#E5DFFF"];
+  const zeroData = values.map(() => 0);
+
+  const chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{
+        data: zeroData,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: "#3E3659"
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: { legend: { display: false } },
+      animation: {
+        duration: 2200,
+        easing: "easeOutQuart",
+        animateRotate: true,
+        animateScale: true
+      }
+    }
+  });
+
+  // 🎨 범례를 HTML로 수동 생성
+  labels.forEach((label, i) => {
+    const item = document.createElement("div");
+    item.style.display = "flex";
+    item.style.alignItems = "center";
+    item.style.gap = "8px";
+    item.innerHTML = `
+      <span style="display:inline-block;width:18px;height:12px;background:${colors[i]};border:1px solid #3E3659;border-radius:2px;"></span>
+      ${label}
+    `;
+    legendDiv.appendChild(item);
+  });
+
+  // 🎞️ 촤라락 애니메이션
+  setTimeout(() => {
+    chart.data.datasets[0].data = values;
+    chart.update();
+  }, 200);
+
+  setTimeout(() => botAsk(), 1300);
+}
+
+
+
+    // 🧠 최종 결과 (5문항 끝나면 호출)
+    function showFinalSummary() {
+      const sorted = Object.entries(totalScores).sort((a, b) => b[1] - a[1]);
+      const top1 = sorted[0][0];
+      const top2 = sorted[1][0];
+
+      const summaryHTML = `
+        <b>최종 관심사 순위</b><br>
+        1. ${sorted[0][0]}<br>
+        2. ${sorted[1][0]}<br>
+        3. ${sorted[2][0]}<br>
+        4. ${sorted[3][0]}<br>
+        5. ${sorted[4][0]}<br><br>
+        이제 <b>${top1}</b>와 <b>${top2}</b> 중 하나를 선택해주세요.<br><br>
+        <div class="choice-box">
+          <button class="choice-btn" onclick="selectTopic('${top1}', this)">${top1}</button>
+          <button class="choice-btn" onclick="selectTopic('${top2}', this)">${top2}</button>
+        </div>
+      `;
+      addMessage(summaryHTML, "bot");
+      chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: "smooth" });
+    }
+
+    // 🔗 주제 선택 후 Spring 서버로 요청
+    function selectTopic(topic, btn) {
+      const box = btn.closest(".choice-box");
+      box.style.transition = "opacity 0.6s ease";
+      box.style.opacity = "0";
+
+      setTimeout(() => {
+        box.remove();
+        currentTopic = topic; // ✅ 주제 저장
+        addMessage(`${topic} 주제를 선택했습니다.`, "user");
+
+        const userAnswers = Array.from(
+          document.querySelectorAll(".user-bubble")
+        ).map(b => b.innerText);
+
+        fetch("/api/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, answers: userAnswers })
+        })
+          .then(res => res.json())
+          .then(data => {
+            currentPlan = data.plan;
+            allowPlanQuestions = true;
+            addMessage(`<b>${topic}</b>에 대한 일주일 계획입니다:<br>${data.plan}`, "bot");
+            addMessage("추가적인 계획 변경이 필요하면 말해주세요 (예: 일요일 계획 야외 활동을 할 수 있게 바꿔줘)", "bot");
+          })
+          .catch(err => {
+            console.error("API 연결 실패:", err);
+            addMessage(`⚠️ 서버 연결 오류 (임시 계획 표시)<br>월~일 ${topic} 관련 활동`, "bot");
+          });
+      }, 600);
+    }
+
+    // 🧠 사용자가 답변 입력 시
+    function handleUserInput() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+
+      if (allowPlanQuestions) {
+        // ✅ 주제 관련성 판단
+        const topicKeywords = [currentTopic, "일정", "요일", "계획", "추천", "활동"];
+        const isTopicRelated = topicKeywords.some(k => text.includes(k));
+
+        if (!isTopicRelated) {
+          addMessage("주제 관련된 질문을 해주세요.", "bot");
+          return;
+        }
+
+        // ✅ refine API로 수정 요청
+        fetch("/api/plan/refine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: currentPlan, request: text })
+        })
+          .then(res => res.json())
+          .then(data => {
+            currentPlan = data.plan;
+            addMessage(`수정된 일주일 계획입니다:<br>${data.plan}`, "bot");
+          })
+          .catch(() => addMessage("계획 수정 중 오류가 발생했습니다.", "bot"));
+      } else {
+        // ⚙️ Flask 연동 (초기 질문 분석)
+        fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sentence: text })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.scores) showResult(data.scores);
+            else addMessage("분석 결과를 불러오지 못했습니다.", "bot");
+          })
+          .catch(() => addMessage("⚠ Flask 서버와 연결할 수 없습니다.", "bot"));
+      }
+    }
+
+    function scrollToBottom(delay = 100) {
+      setTimeout(() => chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: "instant" }), delay);
+    }
+
+    sendBtn.addEventListener("click", handleUserInput);
+    input.addEventListener("keypress", e => e.key === "Enter" && handleUserInput());
+
+    document.addEventListener("DOMContentLoaded", () => {
+      qIndex = 0;
+      botAsk();
+    });
+</script>
+
+</script>
+</body>
+</html>

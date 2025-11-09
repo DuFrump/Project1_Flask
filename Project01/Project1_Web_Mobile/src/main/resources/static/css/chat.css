@@ -1,0 +1,227 @@
+body {
+  background-color: #dcdcdc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: "Malgun Gothic", sans-serif;
+}
+
+/* 아이폰 프레임 */
+.window {
+  background-color: #3e3659;
+  width: 400px;
+  height: 800px;
+  border-radius: 40px;
+  border: 8px solid #2b2440;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* 상단 헤더 */
+.header {
+  background-color: #e6dbff;
+  height: 80px;
+  position: relative;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+}
+.diamond {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 20px;
+  height: 20px;
+  background-color: #874fff;
+  transform: rotate(45deg);
+}
+
+/* 대화창 */
+.chat-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 말풍선 */
+.bot-bubble,
+.user-bubble {
+  max-width: 75%;
+  padding: 12px 18px;
+  border-radius: 18px;
+  line-height: 1.4;
+  font-size: 15px;
+}
+.bot-bubble {
+  background-color: #dcccff;
+  color: #3e3659;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+}
+.user-bubble {
+  background-color: #bbaaf5;
+  color: #fff;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+}
+
+/* 입력창 */
+.input-area {
+  background-color: #e6dbff;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+}
+.input-area input {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+.input-area button {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: #3e3659;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* 결과 박스 */
+.result-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background-color: #dcccff;
+  padding: 10px;
+  border-radius: 15px;
+}
+.result-box canvas {
+  width: 140px !important;
+  height: 140px !important;
+}
+.rank-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  color: #3e3659;
+  line-height: 1.6;
+}
+
+.choice-box {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.choice-btn {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 25px; /* ✅ 더 둥글게 */
+  padding: 10px 22px;  /* ✅ 크기 업 */
+  font-weight: 600;
+  font-size: 15px;
+  color: #3e3659;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+}
+
+.choice-btn:hover {
+  background-color: #d9c8ff;
+  transform: scale(1.05);
+}
+
+/* ===== 오직 타이포그래피(폰트/두께/입체감)만 적용 ===== */
+
+/* Pretendard 불러오기 (없으면 시스템 글꼴로 대체됩니다) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+/* 전체 기본 폰트만 변경 (레이아웃 영향 없음) */
+body {
+  font-family: "Pretendard", "Malgun Gothic", "Noto Sans KR", sans-serif;
+}
+
+/* 말풍선 내부 텍스트: 가독성·존재감 증가 (크기/패딩 건드리지 않음) */
+.bot-bubble,
+.user-bubble {
+  font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-weight: 500;            /* 약간 굵게 — 존재감 증가 */
+  letter-spacing: -0.2px;      /* 한글에 어울리는 미세 압축 */
+  line-height: 1.6;            /* 읽기 편하게 유지 (기존 1.4와 큰 차이 없음) */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 미세한 텍스트 음영(입체감) — 매우 약한 값으로만 적용 */
+.bot-bubble {
+  color: inherit; /* 기존 색상 유지 */
+  text-shadow: 0.25px 0.25px 0 rgba(0,0,0,0.06);
+}
+
+/* 사용자 말풍선은 조금 더 강한 가독성 */
+.user-bubble {
+  color: inherit;
+  text-shadow: 0.3px 0.3px 0 rgba(0,0,0,0.08);
+}
+
+/* 질문/타이틀 강조(선택자에 strong을 쓰는 경우만 효과) */
+.bot-bubble strong,
+.bot-bubble b {
+  font-weight: 700; /* 강조 텍스트만 굵게 */
+  letter-spacing: -0.25px;
+}
+
+/* 입력창 글꼴만 변경 (레이아웃 영향 없음) */
+.input-area input,
+.input-area textarea {
+  font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.15px;
+}
+
+/* 결과 텍스트, 순위 목록 등 (글꼴 통일) */
+.rank-list,
+.result-box,
+.result-box p,
+.result-box li {
+  font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+/* 버튼 텍스트만 미세 조정 (버튼 크기/모양 건들지 않음) */
+.choice-btn {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.25px;
+}
+
+/* ===== result-box 안의 요일만 굵게 ===== */
+
+/* Pretendard 기반 타이포 유지 + 요일 강조 */
+.result-box p:first-line {
+  font-weight: 700;
+  color: #1e1b33; /* 살짝 진하게 */
+}
+
+
+
+
+
+
+
+
